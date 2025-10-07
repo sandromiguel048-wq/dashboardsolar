@@ -35,7 +35,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/data');
+        const response = await fetch('https://painel-solar.onrender.com/api/data');
         const json = await response.json();
         setData(json);
 
