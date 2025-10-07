@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: dashboardsolar1
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: |
+      cd frontend
+      npm install
+      npm run build
+      cp -r build/* ../build
+    startCommand: gunicorn app:app
+    repo: https://github.com/sandromiguel048-wq/dashboardsolar
+    branch: main
+    autoDeploy: true
