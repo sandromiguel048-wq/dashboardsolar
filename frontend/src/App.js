@@ -29,16 +29,22 @@ ChartJS.register(
 function App() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [erroAPI, setErroAPI] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState('dia');
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://painel-solar.onrender.com/api/data');
+      const baseURL = process.env.REACT_APP_API_URL || "";
+const response = await fetch(`${baseURL}/api/data?period=dia`);
+
+
+        if (!response.ok) throw new Error('Falha na resposta da API');
         const json = await response.json();
         setData(json);
-
+        setErroAPI(false);
         setMessages([
           `🔆 Produzidos ${json.kpis.kwh_producao} kWh — evitadas ${json.kpis.toneladas_co2} toneladas de CO₂ e poupadas ${json.kpis.arvores_plantadas} árvores 🌱`,
           `🌍 Reduzimos ${json.kpis.toneladas_co2} toneladas de CO₂ — ótimo progresso!`,
@@ -46,15 +52,23 @@ function App() {
         ]);
       } catch (error) {
         console.error('Erro a carregar os dados:', error);
+        setErroAPI(true);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 5000);
-    return () => clearInterval(interval);
-  }, []);
+
+    const timeout = setTimeout(() => {
+      if (loading) {
+        setLoading(false);
+        setErroAPI(true);
+      }
+    }, 10000);
+
+    return () => clearTimeout(timeout);
+  }, [selectedPeriod]);
 
   useEffect(() => {
     if (messages.length === 0) return;
@@ -64,8 +78,12 @@ function App() {
     return () => clearInterval(interval);
   }, [messages]);
 
-  if (loading || !data) {
-    return <div className="loading">A carregar dados...</div>;
+  if (loading) {
+    return <div className="loading">A iniciar servidor... aguarde ⏳</div>;
+  }
+
+  if (erroAPI || !data) {
+    return <div className="loading erro">Não foi possível carregar os dados. Verifique a API ou tente mais tarde ⚠️</div>;
   }
 
   const { kpis, grafico_producao, composicao_consumo } = data;
@@ -159,22 +177,37 @@ function App() {
           <h1 className="main-title">ENERGIA SOLAR EM TEMPO REAL</h1>
         </div>
         <div className="header-right">
-          <img
-            src="/Logo_Energaia_Energy_Agency_Porto.png"
-            alt="Logo Energaia"
-            className="header-logo"
-          />
+          <img src="/Logo_Energaia_Energy_Agency_Porto.png" alt="Logo Energaia" className="header-logo" />
         </div>
       </header>
 
       <main className="dashboard-content">
         <section className="kpi-section">
-          <h2>KPI Produção</h2>
+          <div className="kpi-header">
+            <h2>KPI Produção</h2>
+            <div className="time-selector">
+              {['dia', 'semana', 'mes', 'ano'].map((periodo) => (
+                <button
+                  key={periodo}
+                  className={selectedPeriod === periodo ? 'active' : ''}
+                  onClick={() => setSelectedPeriod(periodo)}
+                >
+                  {{
+                    dia: 'Hoje',
+                    semana: 'Semana',
+                    mes: 'Mês',
+                    ano: 'Ano'
+                  }[periodo]}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <div className="kpi-grid">
             <div className="kpi-card">
               <img src="/carregador-de-smartphone.png" alt="Icon Bateria" className="kpi-image-icon" />
               <div className="kpi-value-main">{kpis.kwh_producao}</div>
-                            <div className="kpi-unit-kwh">kWh</div>
+              <div className="kpi-unit-kwh">kWh</div>
             </div>
             <div className="kpi-card">
               <img src="/sol.png" alt="Icon Sol" className="kpi-image-icon" />
@@ -184,7 +217,7 @@ function App() {
             <div className="kpi-card">
               <img src="/co2.png" alt="Icon CO2" className="kpi-image-icon" />
               <div className="kpi-value-main">{kpis.toneladas_co2}</div>
-              <div className="kpi-unit">Tons CO₂</div>
+              <div className="kpi-unit">Ton CO₂</div>
             </div>
             <div className="kpi-card">
               <img src="/tree.png" alt="Icon Árvore" className="kpi-image-icon" />
@@ -210,7 +243,7 @@ function App() {
           <div className="chart-container-right">
             <h2>Composição de Consumo</h2>
             <div className="chart-content">
-              <Bar data={barChartData} options={barChartOptions} />
+                            <Bar data={barChartData} options={barChartOptions} />
             </div>
           </div>
         </section>

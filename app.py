@@ -2,6 +2,14 @@ from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
 import sqlite3
 import os
+import logging
+
+# Configuração de logs
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Caminho absoluto do banco de dados
+DB_PATH = os.path.join(os.path.dirname(__file__), 'dados.db')
 
 app = Flask(__name__, static_folder='build', static_url_path='/')
 CORS(app)
@@ -17,10 +25,10 @@ def serve_static(path):
 @app.route('/api/data')
 def get_dashboard_data():
     try:
-        period = request.args.get('period', 'dia')
-        conn = sqlite3.connect("dados.db")
+        conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 
+        # KPIs - pega o último registo
         cursor.execute("""
             SELECT energia_kwh, potencia_kw, co2_evitado, arvores_plantadas, euros_poupados
             FROM kpis_diarios
@@ -33,17 +41,18 @@ def get_dashboard_data():
         arvores = row[3] if row else 0
         euros = row[4] if row else 0
 
+        # Gráfico de produção - pega todos os registos existentes
         cursor.execute("""
-            SELECT strftime('%Hh', data), producao_kw, consumo_kw
+            SELECT data, producao_kw, consumo_kw
             FROM grafico_producao_kw
-            WHERE date(data) = date('now')
             ORDER BY data ASC
         """)
         grafico = cursor.fetchall()
-        labels = [linha[0] for linha in grafico]
+        labels = [linha[0].split(' ')[1][:2] + 'h' for linha in grafico]  # pega hora HH
         producao = [linha[1] for linha in grafico]
         consumo = [linha[2] for linha in grafico]
 
+        # Composição de consumo
         cursor.execute("""
             SELECT categoria, grafico_percentagem
             FROM composicao_consumo
@@ -74,4 +83,9 @@ def get_dashboard_data():
             }
         })
     except Exception as e:
+        logger.error(f"Erro ao obter dados: {e}")
         return jsonify({"erro": str(e)}), 500
+
+# Somente para testes locais
+if __name__ == "__main__":
+    app.run(debug=True)

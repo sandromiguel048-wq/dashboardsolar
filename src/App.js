@@ -37,7 +37,9 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`/api/data?period=${selectedPeriod}`);
+      const baseURL = process.env.REACT_APP_API_URL || "";
+const response = await fetch(`${baseURL}/api/data?period=dia`);
+
 
         if (!response.ok) throw new Error('Falha na resposta da API');
         const json = await response.json();
