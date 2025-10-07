@@ -34,15 +34,16 @@ function App() {
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [messages, setMessages] = useState([]);
 
+  // UseEffect para buscar dados da API
   useEffect(() => {
     const fetchData = async () => {
       try {
-      const baseURL = process.env.REACT_APP_API_URL || "";
-const response = await fetch(`${baseURL}/api/data?period=dia`);
-
+        const baseURL = process.env.REACT_APP_API_URL || '';
+        const response = await fetch(`${baseURL}/api/data?period=${selectedPeriod}`);
 
         if (!response.ok) throw new Error('Falha na resposta da API');
         const json = await response.json();
+
         setData(json);
         setErroAPI(false);
         setMessages([
@@ -60,6 +61,7 @@ const response = await fetch(`${baseURL}/api/data?period=dia`);
 
     fetchData();
 
+    // Timeout de 10s para falha na API
     const timeout = setTimeout(() => {
       if (loading) {
         setLoading(false);
@@ -68,8 +70,9 @@ const response = await fetch(`${baseURL}/api/data?period=dia`);
     }, 10000);
 
     return () => clearTimeout(timeout);
-  }, [selectedPeriod]);
+  }, [selectedPeriod, loading]); // 🔹 loading adicionado para ESLint
 
+  // UseEffect para ticker de mensagens
   useEffect(() => {
     if (messages.length === 0) return;
     const interval = setInterval(() => {
@@ -88,6 +91,7 @@ const response = await fetch(`${baseURL}/api/data?period=dia`);
 
   const { kpis, grafico_producao, composicao_consumo } = data;
 
+  // Configuração do gráfico de linha
   const lineChartData = {
     labels: grafico_producao.labels,
     datasets: [
@@ -123,23 +127,14 @@ const response = await fetch(`${baseURL}/api/data?period=dia`);
       }
     },
     scales: {
-      x: {
-        ticks: { color: '#333', font: { size: 10 }, autoSkip: false }
-      },
-      y: {
-        ticks: {
-          color: '#333',
-          font: { size: 10 },
-          callback: value => `${value} kWh`
-        }
-      }
+      x: { ticks: { color: '#333', font: { size: 10 }, autoSkip: false } },
+      y: { ticks: { color: '#333', font: { size: 10 }, callback: value => `${value} kWh` } }
     }
   };
 
+  // Configuração do gráfico de barras
   const totalConsumo = composicao_consumo.valores.reduce((sum, v) => sum + v, 0);
-  const porcentagens = composicao_consumo.valores.map(v =>
-    ((v / totalConsumo) * 100).toFixed(0)
-  );
+  const porcentagens = composicao_consumo.valores.map(v => ((v / totalConsumo) * 100).toFixed(0));
 
   const barChartData = {
     labels: composicao_consumo.labels,
@@ -161,8 +156,7 @@ const response = await fetch(`${baseURL}/api/data?period=dia`);
       datalabels: {
         anchor: 'end',
         align: 'right',
-        formatter: (value, context) =>
-          `${context.dataset.porcentagens[context.dataIndex]}%`,
+        formatter: (value, context) => `${context.dataset.porcentagens[context.dataIndex]}%`,
         color: '#333',
         font: { weight: 'bold' }
       }
@@ -192,12 +186,7 @@ const response = await fetch(`${baseURL}/api/data?period=dia`);
                   className={selectedPeriod === periodo ? 'active' : ''}
                   onClick={() => setSelectedPeriod(periodo)}
                 >
-                  {{
-                    dia: 'Hoje',
-                    semana: 'Semana',
-                    mes: 'Mês',
-                    ano: 'Ano'
-                  }[periodo]}
+                  {{ dia: 'Hoje', semana: 'Semana', mes: 'Mês', ano: 'Ano' }[periodo]}
                 </button>
               ))}
             </div>
@@ -243,7 +232,7 @@ const response = await fetch(`${baseURL}/api/data?period=dia`);
           <div className="chart-container-right">
             <h2>Composição de Consumo</h2>
             <div className="chart-content">
-                            <Bar data={barChartData} options={barChartOptions} />
+              <Bar data={barChartData} options={barChartOptions} />
             </div>
           </div>
         </section>
