@@ -1,0 +1,242 @@
+:root {
+  --bg: #f4f6f8;
+  --text: #333;
+  --card: #fff;
+  --accent: #FF3B30;
+  --accent-alt: #3B82F6;
+  --shadow: rgba(0, 0, 0, 0.1);
+  --border: #ddd;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1a1a2e;
+    --text: #e0e0e0;
+    --card: #2a2a44;
+    --accent: #FF3B30;
+    --accent-alt: #3B82F6;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --border: #444;
+  }
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* === Base === */
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  box-sizing: border-box;
+}
+
+.dashboard-container {
+  padding: 20px;
+  width: 1200px;
+  max-width: 95%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* === Header === */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  height: 50px;
+  margin-left: 10px;
+}
+
+.main-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+/* === KPI Section === */
+.kpi-section {
+  margin-top: 10px;
+}
+
+.kpi-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.kpi-section h2 {
+  color: var(--text);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.time-selector {
+  display: flex;
+  gap: 8px;
+}
+
+.time-selector button {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--text);
+  transition: 0.3s ease;
+}
+
+.time-selector button.active {
+  background-color: var(--accent-alt);
+  color: #fff;
+  border-color: var(--accent-alt);
+}
+
+.time-selector button:hover:not(.active) {
+  background-color: #e0e0e0;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+}
+
+.kpi-card {
+  background-color: var(--card);
+  border-radius: 12px;
+  padding: 18px;
+  text-align: center;
+  box-shadow: 0 2px 6px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.kpi-image-icon {
+  width: 32px;
+  margin-bottom: 6px;
+}
+
+.kpi-value-main {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--accent);
+  line-height: 1.2;
+}
+
+.kpi-unit, .kpi-unit-kwh {
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-top: -2px;
+  margin-bottom: 2px;
+}
+
+.kpi-subtitle-small {
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 4px;
+}
+
+/* === Chart Section === */
+.charts-section {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+  flex-grow: 1;
+}
+
+.chart-container-line-full,
+.chart-container-right {
+  background-color: var(--card);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  min-height: 320px;
+  height: auto;
+}
+
+.chart-container-line-full h2,
+.chart-container-right h2 {
+  font-size: 1rem;
+  color: var(--text);
+  font-weight: 500;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.chart-content {
+  flex-grow: 1;
+  position: relative;
+}
+
+/* === Ticker inteligente === */
+.ticker-section {
+  margin-top: 25px;
+  padding: 12px 0;
+  background-color: var(--card);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px var(--shadow);
+  overflow: hidden;
+}
+
+.ticker {
+  white-space: nowrap;
+  padding: 6px 12px;
+}
+
+.ticker p {
+  display: inline-block;
+  animation: scroll-left 14s linear infinite;
+  font-size: 0.9rem;
+  color: var(--text);
+  will-change: transform;
+}
+
+.ticker:hover p {
+  animation-play-state: paused;
+}
+
+/* === Loader === */
+.loading {
+  font-size: 1.2rem;
+  color: var(--text);
+  margin-top: 50px;
+  text-align: center;
+}

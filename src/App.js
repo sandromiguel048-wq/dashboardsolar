@@ -29,6 +29,7 @@ ChartJS.register(
 function App() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [erroAPI, setErroAPI] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState('dia');
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
   const [messages, setMessages] = useState([]);
@@ -37,8 +38,11 @@ function App() {
     const fetchData = async () => {
       try {
         const response = await fetch(`/api/data?period=${selectedPeriod}`);
+
+        if (!response.ok) throw new Error('Falha na resposta da API');
         const json = await response.json();
         setData(json);
+        setErroAPI(false);
         setMessages([
           `🔆 Produzidos ${json.kpis.kwh_producao} kWh — evitadas ${json.kpis.toneladas_co2} toneladas de CO₂ e poupadas ${json.kpis.arvores_plantadas} árvores 🌱`,
           `🌍 Reduzimos ${json.kpis.toneladas_co2} toneladas de CO₂ — ótimo progresso!`,
@@ -46,12 +50,22 @@ function App() {
         ]);
       } catch (error) {
         console.error('Erro a carregar os dados:', error);
+        setErroAPI(true);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
+
+    const timeout = setTimeout(() => {
+      if (loading) {
+        setLoading(false);
+        setErroAPI(true);
+      }
+    }, 10000);
+
+    return () => clearTimeout(timeout);
   }, [selectedPeriod]);
 
   useEffect(() => {
@@ -62,8 +76,12 @@ function App() {
     return () => clearInterval(interval);
   }, [messages]);
 
-  if (loading || !data) {
-    return <div className="loading">A carregar dados...</div>;
+  if (loading) {
+    return <div className="loading">A iniciar servidor... aguarde ⏳</div>;
+  }
+
+  if (erroAPI || !data) {
+    return <div className="loading erro">Não foi possível carregar os dados. Verifique a API ou tente mais tarde ⚠️</div>;
   }
 
   const { kpis, grafico_producao, composicao_consumo } = data;
@@ -223,7 +241,7 @@ function App() {
           <div className="chart-container-right">
             <h2>Composição de Consumo</h2>
             <div className="chart-content">
-              <Bar data={barChartData} options={barChartOptions} />
+                            <Bar data={barChartData} options={barChartOptions} />
             </div>
           </div>
         </section>
