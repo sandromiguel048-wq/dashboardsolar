@@ -1,0 +1,10 @@
+{
+    "success": false,
+    "status": 403,
+    "message": "permission denied for 'sensor_write'",
+    "title": "Permission denied",
+    "info": {
+        "title": "Permission denied",
+        "message": "permission denied for 'sensor_write'"
+    }
+}

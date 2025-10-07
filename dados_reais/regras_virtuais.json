@@ -1,0 +1,351 @@
+[
+  {
+    "fa582664-9e26-45fe-ab2f-f051b5dc5db5": {
+      "id": "fa582664-9e26-45fe-ab2f-f051b5dc5db5",
+      "title": "PV - AC Energie pro Anlage",
+      "priority": 58,
+      "type": "graph"
+    },
+    "de6799c1-1fb7-4009-8c4b-1f6b6232c532": {
+      "id": "de6799c1-1fb7-4009-8c4b-1f6b6232c532",
+      "title": "PV - Battery Energy from power",
+      "priority": 57,
+      "type": "graph"
+    },
+    "c3c2a1b0-2461-4556-bb23-9f973606a2b1": {
+      "id": "c3c2a1b0-2461-4556-bb23-9f973606a2b1",
+      "title": "PV - FDD_COMM: Inverter communication down",
+      "priority": 11,
+      "type": "graph"
+    },
+    "5a955df4-e5dc-4bc0-8bc1-276ecc909dde": {
+      "id": "5a955df4-e5dc-4bc0-8bc1-276ecc909dde",
+      "title": "PV - FDD_DCC: DC current comparison per INV for outlier detection",
+      "priority": 91.3,
+      "type": "graph"
+    },
+    "95a09144-0e29-4cf9-b43a-50cdb7b78215": {
+      "id": "95a09144-0e29-4cf9-b43a-50cdb7b78215",
+      "title": "PV - FDD_IOUT: Inverter outage",
+      "priority": 65,
+      "type": "graph"
+    },
+    "973f5fec-6b97-42e1-8d47-e6a5ea1d7c92": {
+      "id": "973f5fec-6b97-42e1-8d47-e6a5ea1d7c92",
+      "title": "PV - FDD_IRU: Inverter Relative Underperformance",
+      "priority": 95,
+      "type": "graph"
+    },
+    "103d8a93-a382-4768-8ad3-3f2fc201ff12": {
+      "id": "103d8a93-a382-4768-8ad3-3f2fc201ff12",
+      "title": "PV - FDD_LWU: Inverter Late Wake-Up",
+      "priority": 85,
+      "type": "graph"
+    },
+    "82b7c1f6-8ea5-4cd3-82a4-d4e2b794969f": {
+      "id": "82b7c1f6-8ea5-4cd3-82a4-d4e2b794969f",
+      "title": "PV - FDD_OPC: Open Circuit Condition",
+      "priority": 103,
+      "type": "graph"
+    },
+    "58a95e8e-2a8d-427c-bd46-c9f794a9dcd6": {
+      "id": "58a95e8e-2a8d-427c-bd46-c9f794a9dcd6",
+      "title": "PV - colors",
+      "priority": 2,
+      "type": "graph"
+    },
+    "41dfa029-39e4-4888-8a49-b96cc913d919": {
+      "id": "41dfa029-39e4-4888-8a49-b96cc913d919",
+      "title": "PV - Inverter communication down per installation",
+      "priority": 13,
+      "type": "graph"
+    },
+    "a4937bb9-00a0-4a2b-90c8-957c1c5c4907": {
+      "id": "a4937bb9-00a0-4a2b-90c8-957c1c5c4907",
+      "title": "PV - Irradiation (kWh/m²)",
+      "priority": 50,
+      "type": "graph"
+    },
+    "d137d817-f108-4829-b07a-9c81c21b886b": {
+      "id": "d137d817-f108-4829-b07a-9c81c21b886b",
+      "title": "PV - Mittelwert pro Anlage",
+      "priority": 2005,
+      "type": "graph"
+    },
+    "afc7cbd1-381e-4591-b47c-41e39b921dea": {
+      "id": "afc7cbd1-381e-4591-b47c-41e39b921dea",
+      "title": "PV - Nennleistung pro Anlage",
+      "priority": 40,
+      "type": "graph"
+    },
+    "20dbafd8-18ae-433f-9f9e-4a956f498e9f": {
+      "id": "20dbafd8-18ae-433f-9f9e-4a956f498e9f",
+      "title": "PV - PR Gesamt Anlage",
+      "priority": 405,
+      "type": "graph"
+    },
+    "f6ba70bb-75cc-4804-8762-09ab9040247c": {
+      "id": "f6ba70bb-75cc-4804-8762-09ab9040247c",
+      "title": "PV - PR Jahr pro WR",
+      "priority": 301,
+      "type": "graph"
+    },
+    "e41f6827-35f0-448e-83a5-714c64c318f8": {
+      "id": "e41f6827-35f0-448e-83a5-714c64c318f8",
+      "title": "PV - PR  Monat pro WR",
+      "priority": 303,
+      "type": "graph"
+    },
+    "7d7cfc38-38ce-456f-9044-4dfeb6817ba0": {
+      "id": "7d7cfc38-38ce-456f-9044-4dfeb6817ba0",
+      "title": "PV - PR pro 5MIN",
+      "priority": 306,
+      "type": "graph"
+    },
+    "ebbc250a-651a-4bc0-9e40-f8ac04848259": {
+      "id": "ebbc250a-651a-4bc0-9e40-f8ac04848259",
+      "title": "PV - PR Tag pro WR",
+      "priority": 302,
+      "type": "graph"
+    },
+    "a7f7cbf9-036b-4cde-9a50-4e34a876a1a4": {
+      "id": "a7f7cbf9-036b-4cde-9a50-4e34a876a1a4",
+      "title": "PV - Solarposition",
+      "priority": 3,
+      "type": "graph"
+    },
+    "7519f35e-facd-46c2-b907-5970888b6d0c": {
+      "id": "7519f35e-facd-46c2-b907-5970888b6d0c",
+      "title": "PV - Spez. AC Leistung",
+      "priority": 62,
+      "type": "graph"
+    },
+    "d0c57381-7c1a-41a6-ae81-91572a1ba642": {
+      "id": "d0c57381-7c1a-41a6-ae81-91572a1ba642",
+      "title": "PV - Spezifischer Ertrag",
+      "priority": 200,
+      "type": "graph"
+    },
+    "5aebc54b-3b0e-4905-8998-ad6492900a9c": {
+      "id": "5aebc54b-3b0e-4905-8998-ad6492900a9c",
+      "title": "PV - Summe Installierte Leistung aller Anlagen",
+      "priority": 41,
+      "type": "graph"
+    },
+    "fc6e3fc7-1058-42ef-ae41-f8e480944c44": {
+      "id": "fc6e3fc7-1058-42ef-ae41-f8e480944c44",
+      "title": "PV - Summe Leistungen",
+      "priority": 60,
+      "type": "graph"
+    },
+    "1e467b68-a1e4-4c08-bc41-3bacab3550b6": {
+      "id": "1e467b68-a1e4-4c08-bc41-3bacab3550b6",
+      "title": "PV - Summe spez. Ertrag pro Anlage",
+      "priority": 207,
+      "type": "graph"
+    },
+    "40f2c56e-5002-444e-8a60-ae706a55cf57": {
+      "id": "40f2c56e-5002-444e-8a60-ae706a55cf57",
+      "title": "PV - W to kW",
+      "priority": 1,
+      "type": "graph"
+    },
+    "f2650606-7237-4d27-9b05-cc9604f0f06e": {
+      "id": "f2650606-7237-4d27-9b05-cc9604f0f06e",
+      "title": "PV - Counter to Consumption",
+      "priority": 1.5,
+      "type": "graph"
+    },
+    "9b75a917-9077-4a1d-a5cd-2a773256d03e": {
+      "id": "9b75a917-9077-4a1d-a5cd-2a773256d03e",
+      "title": "PV - FDD_MPPT EN: Energy measurement broken",
+      "priority": 104,
+      "type": "graph"
+    },
+    "7d7a0a59-db7a-4197-9187-5c0bb66d7580": {
+      "id": "7d7a0a59-db7a-4197-9187-5c0bb66d7580",
+      "title": "PV - Weather",
+      "priority": 4000,
+      "type": "graph"
+    },
+    "e9109046-2870-4745-b3dd-57e5bd7dd7f2": {
+      "id": "e9109046-2870-4745-b3dd-57e5bd7dd7f2",
+      "title": "Missing current and Energy alarm",
+      "priority": 5000,
+      "type": "graph"
+    },
+    "0c149bb8-5fd6-43f2-afee-87e6c3b216a4": {
+      "id": "0c149bb8-5fd6-43f2-afee-87e6c3b216a4",
+      "title": "PV - METER: split readings (+/-)",
+      "priority": 5,
+      "type": "graph"
+    },
+    "09e7f5f7-2f10-4a12-ad8a-fb2ead92529e": {
+      "id": "09e7f5f7-2f10-4a12-ad8a-fb2ead92529e",
+      "title": "PV - BATTERY: split readings (+/-)",
+      "priority": 4,
+      "type": "graph"
+    },
+    "1d6b7221-90ba-41ad-8e5b-03dc3b80ff72": {
+      "id": "1d6b7221-90ba-41ad-8e5b-03dc3b80ff72",
+      "title": "PV - Energy balance: Consumption PANT (DAY)",
+      "priority": 59,
+      "type": "graph"
+    },
+    "0edba6c2-1727-4a36-a573-7d3fedbf1a71": {
+      "id": "0edba6c2-1727-4a36-a573-7d3fedbf1a71",
+      "title": "PV - Energy balance: Production PLANT (DAY)",
+      "priority": 59.5,
+      "type": "graph"
+    },
+    "608db1c3-fe04-47b4-ade2-a3c778927861": {
+      "id": "608db1c3-fe04-47b4-ade2-a3c778927861",
+      "title": "PV - Energy balance: Energies from powers",
+      "priority": 5.5,
+      "type": "graph"
+    },
+    "1021de67-6729-4fbc-88db-0a646d48f475": {
+      "id": "1021de67-6729-4fbc-88db-0a646d48f475",
+      "title": "Base layer",
+      "type": "baseLayer"
+    },
+    "8ffea90c-5e6b-468d-9dce-e570a404889b": {
+      "id": "8ffea90c-5e6b-468d-9dce-e570a404889b",
+      "title": "BACNET - Stuck important values",
+      "priority": 0.2,
+      "type": "graph"
+    },
+    "b71d27aa-13ad-40a5-86cc-9fb23c61a2de": {
+      "id": "b71d27aa-13ad-40a5-86cc-9fb23c61a2de",
+      "title": "PV - fusionsolar Energy from Power",
+      "priority": 5.2,
+      "type": "graph"
+    },
+    "b7aa701a-1259-402f-9624-226457eaf0a2": {
+      "id": "b7aa701a-1259-402f-9624-226457eaf0a2",
+      "title": "Sum of al el. counter - E_F",
+      "priority": 3000,
+      "type": "graph"
+    },
+    "928e63f5-4fea-49bf-b704-d5c923efcad2": {
+      "id": "928e63f5-4fea-49bf-b704-d5c923efcad2",
+      "title": "MTR.EL - renewable energy self consumed - E_REU",
+      "priority": 3002,
+      "type": "graph"
+    },
+    "d55c03e7-b225-4bbc-828b-eb9f4ed658b0": {
+      "id": "d55c03e7-b225-4bbc-828b-eb9f4ed658b0",
+      "title": "MTR.EL - fraction of final energy consumed - RE_Sh",
+      "priority": 3004,
+      "type": "graph"
+    },
+    "c1d2dfa6-cca3-4b9c-89d4-6dc6ccdad26c": {
+      "id": "c1d2dfa6-cca3-4b9c-89d4-6dc6ccdad26c",
+      "title": "MTR.El - Renewable energy production to consumption ratio",
+      "priority": 3006,
+      "type": "graph"
+    },
+    "9954e11b-5eed-4a88-bf98-427f342564fa": {
+      "id": "9954e11b-5eed-4a88-bf98-427f342564fa",
+      "title": "MTR.EL - On-site renewable energy utilization - RE_UT",
+      "priority": 3008,
+      "type": "graph"
+    },
+    "5a520824-9fd9-43b1-8e4b-1d7c262c2a0a": {
+      "id": "5a520824-9fd9-43b1-8e4b-1d7c262c2a0a",
+      "title": "PV - Energy balance: Grid (15MIN)",
+      "priority": 58.5,
+      "type": "graph"
+    },
+    "40da16b3-43f9-4342-a627-50f8c8a8b193": {
+      "id": "40da16b3-43f9-4342-a627-50f8c8a8b193",
+      "title": "PV - Energy balance: battery exchange",
+      "priority": 55,
+      "type": "graph"
+    },
+    "6ad1ea2c-8de8-41ae-87fe-788030aa807d": {
+      "id": "6ad1ea2c-8de8-41ae-87fe-788030aa807d",
+      "title": "PV: CO2 - Emission savings (kg CO2)",
+      "priority": 59.6,
+      "type": "graph"
+    },
+    "2281a49a-8111-4270-b84c-cc8d7cb9da3a": {
+      "id": "2281a49a-8111-4270-b84c-cc8d7cb9da3a",
+      "title": "shift growatt in time",
+      "priority": 3.5,
+      "type": "graph"
+    },
+    "9a8cbe97-b3d0-4318-92f5-4ab5cad6601a": {
+      "id": "9a8cbe97-b3d0-4318-92f5-4ab5cad6601a",
+      "title": "energy from power / historic",
+      "priority": 3010,
+      "type": "graph"
+    },
+    "3d968d72-2a30-44cb-98ec-86e8d530acd7": {
+      "id": "3d968d72-2a30-44cb-98ec-86e8d530acd7",
+      "title": "SELF used el",
+      "priority": 3001,
+      "type": "graph"
+    },
+    "64887614-7dd4-4199-9e78-ee0e0ec99db8": {
+      "id": "64887614-7dd4-4199-9e78-ee0e0ec99db8",
+      "title": "HP starts",
+      "priority": 3500,
+      "type": "graph"
+    },
+    "7902348e-69d3-4bf2-a9ec-2ed2ef00c102": {
+      "id": "7902348e-69d3-4bf2-a9ec-2ed2ef00c102",
+      "title": "Energy for duration curve",
+      "priority": 3600,
+      "type": "graph"
+    },
+    "cd575c67-3dd1-4724-923f-eb1c0120d1bf": {
+      "id": "cd575c67-3dd1-4724-923f-eb1c0120d1bf",
+      "title": "overall mean rooms",
+      "priority": 3700,
+      "type": "graph"
+    },
+    "95881484-a9c0-4d68-89e9-cdb7b8ca27bf": {
+      "id": "95881484-a9c0-4d68-89e9-cdb7b8ca27bf",
+      "title": "Delete wrong data from weather station",
+      "priority": 0.5,
+      "type": "graph"
+    },
+    "482da87b-64ca-45aa-9944-86b9a04e95ba": {
+      "id": "482da87b-64ca-45aa-9944-86b9a04e95ba",
+      "title": "Behaglichkeit Raumlufttemperatur",
+      "priority": 3710,
+      "type": "graph"
+    },
+    "68897d6d-82e6-4095-9d12-9bc14db2eca7": {
+      "id": "68897d6d-82e6-4095-9d12-9bc14db2eca7",
+      "title": "Behaglichkeit/Temperatur für Belegungsstunden",
+      "priority": 3715,
+      "type": "graph"
+    },
+    "260593db-ecbd-4a34-ad24-e57785519a7d": {
+      "id": "260593db-ecbd-4a34-ad24-e57785519a7d",
+      "title": "CO2 Grenzwerte",
+      "priority": 3730,
+      "type": "graph"
+    },
+    "b81fba3e-3c78-462a-9703-016a6ecdcd13": {
+      "id": "b81fba3e-3c78-462a-9703-016a6ecdcd13",
+      "title": "CO2 % Komfort",
+      "priority": 3740,
+      "type": "graph"
+    },
+    "52b77834-bc4d-4869-ad7a-c0a0b3dddf6d": {
+      "id": "52b77834-bc4d-4869-ad7a-c0a0b3dddf6d",
+      "title": "% Comfort, Discomfort",
+      "priority": 3720,
+      "type": "graph"
+    },
+    "85935bf5-9c1e-4282-a994-f37db6541417": {
+      "id": "85935bf5-9c1e-4282-a994-f37db6541417",
+      "title": "Belegungsstunden",
+      "priority": 3701,
+      "type": "graph"
+    }
+  }
+]
