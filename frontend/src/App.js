@@ -1,249 +1,382 @@
-import React, { useState, useEffect } from 'react';
-import './style.css';
-import { Line, Bar } from 'react-chartjs-2';
+import React, { useState, useEffect } from "react";
+import { Bar } from "react-chartjs-2";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement
-} from 'chart.js';
-import ChartDataLabels from 'chartjs-plugin-datalabels';
+  Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend,
+} from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  BarElement,
-  ChartDataLabels
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ChartDataLabels);
+
+const fmt = (v, dec = 2) => {
+  const n = Number(v);
+  if (isNaN(n)) return "0,00";
+  return n.toLocaleString("pt-PT", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+};
+const safe = (v) => Number(v) || 0;
+
+function useClock() {
+  const [time, setTime] = useState(new Date());
+  useEffect(() => {
+    const t = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  return time;
+}
 
 function App() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [erroAPI, setErroAPI] = useState(false);
-  const [selectedPeriod, setSelectedPeriod] = useState('dia');
-  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
-  const [messages, setMessages] = useState([]);
+  const [data, setData]         = useState(null);
+  const [scale, setScale]       = useState(1);
+  const [flyer, setFlyer]       = useState(0);
+  const [showSlide, setShowSlide] = useState(false);
+  const clock = useClock();
 
-  // UseEffect para buscar dados da API
+  const flyers = ["/flyer.png", "/ano-letivo-2026-2027.jpeg", "/flyer2.png.jpeg"];
+
   useEffect(() => {
-    const fetchData = async () => {
+    const handle = () => setScale(Math.min(window.innerWidth / 1920, window.innerHeight / 1080) * 0.98);
+    handle();
+    window.addEventListener("resize", handle);
+    return () => window.removeEventListener("resize", handle);
+  }, []);
+
+  useEffect(() => {
+    const t = setInterval(() => setFlyer(p => (p + 1) % flyers.length), 120000);
+    return () => clearInterval(t);
+  }, [flyers.length]);
+
+  // Flyer a ecrã inteiro: aparece a cada 45s, fica 8s, e desaparece
+  useEffect(() => {
+    let hideTimer;
+    const showEvery = setInterval(() => {
+      setShowSlide(true);
+      hideTimer = setTimeout(() => setShowSlide(false), 30000);
+    }, 240000);
+    return () => { clearInterval(showEvery); clearTimeout(hideTimer); };
+  }, []);
+
+  useEffect(() => {
+    const load = async () => {
       try {
-        const baseURL = process.env.REACT_APP_API_URL || '';
-        const response = await fetch(`${baseURL}/api/data?period=${selectedPeriod}`);
-
-        if (!response.ok) throw new Error('Falha na resposta da API');
-        const json = await response.json();
-
-        setData(json);
-        setErroAPI(false);
-        setMessages([
-          `🔆 Produzidos ${json.kpis.kwh_producao} kWh — evitadas ${json.kpis.toneladas_co2} toneladas de CO₂ e poupadas ${json.kpis.arvores_plantadas} árvores 🌱`,
-          `🌍 Reduzimos ${json.kpis.toneladas_co2} toneladas de CO₂ — ótimo progresso!`,
-          `💰 Poupança estimada: ${json.kpis.euros_poupados} euros — energia limpa compensa!`
-        ]);
-      } catch (error) {
-        console.error('Erro a carregar os dados:', error);
-        setErroAPI(true);
-      } finally {
-        setLoading(false);
-      }
+        const res = await fetch(`${process.env.REACT_APP_API_URL || "http://localhost:5002"}/api/kpis`);
+        setData(await res.json());
+      } catch (e) { console.error(e); }
     };
+    load();
+    const t = setInterval(load, 60000);
+    return () => clearInterval(t);
+  }, []);
 
-    fetchData();
+  const d = data || {};
+  const {
+    data_hora,
+    pv_current_kw = 0, battery_current_kw = 0, rede_kw = 0, injecao_kw = 0,
+    autoconsumo_kw = 0, pot_total_kw = 0, kwh_producao = 0, kwh_consumo = 0,
+    kwh_injecao = 0, kwh_autoconsumo = 0, toneladas_co2 = 0, carvao_poupado = 0, arvores_plantadas = 0,
+  } = d;
 
-    // Timeout de 10s para falha na API
-    const timeout = setTimeout(() => {
-      if (loading) {
-        setLoading(false);
-        setErroAPI(true);
-      }
-    }, 10000);
-
-    return () => clearTimeout(timeout);
-  }, [selectedPeriod, loading]); // 🔹 loading adicionado para ESLint
-
-  // UseEffect para ticker de mensagens
-  useEffect(() => {
-    if (messages.length === 0) return;
-    const interval = setInterval(() => {
-      setCurrentMessageIndex(prev => (prev + 1) % messages.length);
-    }, 16000);
-    return () => clearInterval(interval);
-  }, [messages]);
-
-  if (loading) {
-    return <div className="loading">A iniciar servidor... aguarde ⏳</div>;
-  }
-
-  if (erroAPI || !data) {
-    return <div className="loading erro">Não foi possível carregar os dados. Verifique a API ou tente mais tarde ⚠️</div>;
-  }
-
-  const { kpis, grafico_producao, composicao_consumo } = data;
-
-  // Configuração do gráfico de linha
-  const lineChartData = {
-    labels: grafico_producao.labels,
-    datasets: [
-      {
-        label: 'Produção',
-        data: grafico_producao.producao,
-        borderColor: '#FF3B30',
-        backgroundColor: 'transparent',
-        tension: 0.4
-      },
-      {
-        label: 'Consumo',
-        data: grafico_producao.consumo,
-        borderColor: '#3B82F6',
-        backgroundColor: 'transparent',
-        tension: 0.4
-      }
-    ]
+  const C = {
+    pv: "#F59E0B", load: "#8B5CF6", grid: "#EF4444",
+    inject: "#3B82F6", battery: "#6366F1", auto: "#10B981",
+    co2: "#22C55E", coal: "#A855F7", tree: "#16A34A",
   };
 
-  const lineChartOptions = {
+  const overlays = [
+    { label: "BATERIA",     value: battery_current_kw, color: C.battery, top: "60%",   left: "12%",  icon: "🔋" },
+    { label: "CARGA",       value: pot_total_kw,        color: C.load,    top: "22%",   left: "22%",  icon: "⚡" },
+    { label: "PV",          value: pv_current_kw,       color: C.pv,      top: "40%",   left: "42%",  icon: "☀️" },
+    { label: "AUTOCONSUMO", value: autoconsumo_kw,      color: C.auto,    top: "47%",   right: "12%", icon: "🔄" },
+    { label: "INJEÇÃO",     value: injecao_kw,          color: C.inject,  top: "16%",   right: "10%", icon: "📤" },
+    { label: "REDE",        value: rede_kw,             color: C.grid,    top: "83%",   left: "82%",  icon: "🔌" },
+    { label: "TOTAL",       value: pot_total_kw,        color: "#475569", bottom: "20%",left: "42%",  icon: "📊" },
+  ];
+
+  const envCards = [
+    { icon: "/co2.png",  label: "CO₂ Evitado",   value: fmt(toneladas_co2),        unit: "ton",     color: C.co2  },
+    { icon: "/tree.png", label: "Árvores Equiv.", value: fmt(arvores_plantadas, 0), unit: "árvores", color: C.tree },
+    { icon: "/euro.png", label: "Carvão Poupado", value: fmt(carvao_poupado),       unit: "ton",     color: C.coal },
+  ];
+
+  const barOpts = (colors) => ({
+    indexAxis: "y",
+    maintainAspectRatio: false,
     responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: 'top',
-        labels: { color: '#333', font: { size: 12, weight: 'bold' } }
-      },
-      tooltip: {
-        callbacks: {
-          label: context => `${context.dataset.label}: ${context.parsed.y} kWh`
-        }
-      }
-    },
-    scales: {
-      x: { ticks: { color: '#333', font: { size: 10 }, autoSkip: false } },
-      y: { ticks: { color: '#333', font: { size: 10 }, callback: value => `${value} kWh` } }
-    }
-  };
-
-  // Configuração do gráfico de barras
-  const totalConsumo = composicao_consumo.valores.reduce((sum, v) => sum + v, 0);
-  const porcentagens = composicao_consumo.valores.map(v => ((v / totalConsumo) * 100).toFixed(0));
-
-  const barChartData = {
-    labels: composicao_consumo.labels,
-    datasets: [
-      {
-        data: composicao_consumo.valores,
-        backgroundColor: ['#FF9800', '#3B82F6', '#607D8B'],
-        barThickness: 20,
-        porcentagens
-      }
-    ]
-  };
-
-  const barChartOptions = {
-    indexAxis: 'y',
-    maintainAspectRatio: false,
+    devicePixelRatio: 2,
+    layout: { padding: { right: 60 } },
     plugins: {
       legend: { display: false },
       datalabels: {
-        anchor: 'end',
-        align: 'right',
-        formatter: (value, context) => `${context.dataset.porcentagens[context.dataIndex]}%`,
-        color: '#333',
-        font: { weight: 'bold' }
-      }
+        color: "#1E293B",
+        backgroundColor: ctx => colors[ctx.dataIndex] + "28",
+        borderRadius: 5,
+        padding: { top: 3, bottom: 3, left: 8, right: 8 },
+        font: { weight: "700", size: 13 },
+        align: "end", anchor: "end",
+        formatter: v => fmt(v),
+      },
     },
-    scales: { x: { display: false }, y: { grid: { display: false } } }
+    scales: {
+      x: { grid: { color: "rgba(0,0,0,0.05)" }, ticks: { font: { size: 11 }, color: "#94A3B8" }, border: { display: false } },
+      y: { grid: { display: false }, ticks: { font: { weight: "600", size: 13 }, color: "#374151" }, border: { display: false } },
+    },
+  });
+
+  const grad = (ctx, color) => {
+    try {
+      const g = ctx.chart.ctx.createLinearGradient(0, 0, ctx.chart.width, 0);
+      g.addColorStop(0, color + "FF"); g.addColorStop(1, color + "88");
+      return g;
+    } catch { return color; }
   };
 
-  return (
-    <div className="dashboard-container">
-      <header className="dashboard-header">
-        <div className="header-left">
-          <h1 className="main-title">ENERGIA SOLAR EM TEMPO REAL</h1>
-        </div>
-        <div className="header-right">
-          <img src="/Logo_Energaia_Energy_Agency_Porto.png" alt="Logo Energaia" className="header-logo" />
-        </div>
-      </header>
+  const consumoColors  = [C.auto, C.grid, "#94A3B8"];
+  const producaoColors = [C.auto, C.inject, "#94A3B8"];
 
-      <main className="dashboard-content">
-        <section className="kpi-section">
-          <div className="kpi-header">
-            <h2>KPI Produção</h2>
-            <div className="time-selector">
-              {['dia', 'semana', 'mes', 'ano'].map((periodo) => (
-                <button
-                  key={periodo}
-                  className={selectedPeriod === periodo ? 'active' : ''}
-                  onClick={() => setSelectedPeriod(periodo)}
-                >
-                  {{ dia: 'Hoje', semana: 'Semana', mes: 'Mês', ano: 'Ano' }[periodo]}
-                </button>
+  const consumoData = {
+    labels: ["Autoconsumo", "Rede", "Total"],
+    datasets: [{ data: [safe(kwh_autoconsumo), safe(kwh_consumo), safe(kwh_autoconsumo) + safe(kwh_consumo)], backgroundColor: ctx => grad(ctx, consumoColors[ctx.dataIndex]), borderRadius: 8, barThickness: 34 }],
+  };
+  const producaoData = {
+    labels: ["Autoconsumo", "Injeção", "Total"],
+    datasets: [{ data: [safe(kwh_autoconsumo), safe(kwh_injecao), safe(kwh_producao)], backgroundColor: ctx => grad(ctx, producaoColors[ctx.dataIndex]), borderRadius: 8, barThickness: 34 }],
+  };
+
+  const ticker = `☀️ Produzidos ${fmt(kwh_producao)} kWh  •  🌍 Evitadas ${fmt(toneladas_co2)} t CO₂  •  🌱 ${fmt(arvores_plantadas, 0)} árvores equivalentes  •  ⚡ Carga atual ${fmt(pot_total_kw)} kW  •  🔋 Bateria ${fmt(battery_current_kw)} kW  •  📤 Injeção ${fmt(injecao_kw)} kW`;
+
+  const card = (extra = {}) => ({
+    background: "#FFFFFF",
+    borderRadius: "16px",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.07), 0 6px 18px rgba(0,0,0,0.06)",
+    ...extra,
+  });
+
+  return (
+    <>
+      <style>{`
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #0F172A; overflow: hidden; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes fadeIn  { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+        @keyframes blink   { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .fade-img { animation: fadeIn 0.7s ease; }
+        .live-dot { animation: blink 2s ease-in-out infinite; }
+      `}</style>
+
+      <div style={{ width: "100vw", height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{
+          width: "1920px", height: "1080px",
+          background: "#F1F5F9",
+          transform: `scale(${scale})`, transformOrigin: "center center",
+          display: "grid",
+          gridTemplateRows: "620px 1fr 60px",
+          padding: "16px 24px",
+          gap: "14px",
+          boxSizing: "border-box",
+          boxShadow: "0 0 120px rgba(0,0,0,0.7)",
+          position: "relative",
+        }}>
+
+          {/* ── MAIN: IMAGEM + PAINEL LATERAL ── */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 310px", gap: "14px" }}>
+
+            {/* FOTO DA ESCOLA — header como overlay */}
+            <div style={{ ...card(), position: "relative", overflow: "hidden" }}>
+              <img
+                src="/dashboard_foto.png" alt="Escola"
+                style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "0 65%", display: "block" }}
+              />
+
+              {/* HEADER OVERLAY no topo da imagem */}
+              <div style={{
+                position: "absolute", top: 0, left: 0, right: 0,
+                background: "linear-gradient(180deg, rgba(10,18,36,0.92) 0%, rgba(10,18,36,0.65) 35%, transparent 100%)",
+                padding: "12px 22px 16px",
+                display: "flex", alignItems: "flex-start", justifyContent: "space-between",
+              }}>
+                {/* Título */}
+                <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+                  <div style={{ width: "4px", height: "44px", background: "linear-gradient(180deg,#F59E0B,#EF4444)", borderRadius: "4px", flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: "0.68rem", color: "#94A3B8", textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 700 }}>Dashboard Solar · procuRE</div>
+                    <h1 style={{ margin: 0, fontSize: "1.6rem", fontWeight: 800, color: "#F8FAFC", letterSpacing: "-0.02em", lineHeight: 1.15 }}>
+                      Escola Básica Manuel António Pina
+                    </h1>
+                  </div>
+                </div>
+
+                {/* Direita: hora + logo */}
+                <div style={{ display: "flex", alignItems: "center", gap: "28px" }}>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: "0.65rem", color: "#64748B", textTransform: "uppercase", letterSpacing: "0.1em", fontWeight: 600 }}>
+                      Última atualização
+                    </div>
+                    <div style={{ fontSize: "0.9rem", color: "#94A3B8", fontWeight: 500 }}>
+                      {data_hora ? new Date(data_hora).toLocaleString("pt-PT") : "—"}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "5px", marginBottom: "2px" }}>
+                      <span className="live-dot" style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#22C55E", display: "inline-block" }} />
+                      <span style={{ fontSize: "0.65rem", color: "#22C55E", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Ao Vivo</span>
+                    </div>
+                    <div style={{ fontSize: "2rem", fontWeight: 800, color: "#F8FAFC", letterSpacing: "0.04em", fontVariantNumeric: "tabular-nums", lineHeight: 1 }}>
+                      {clock.toLocaleTimeString("pt-PT")}
+                    </div>
+                  </div>
+                  <img src="/Logo_Energaia_Energy_Agency_Porto.png" alt="Logo"
+                    style={{ height: "46px", filter: "brightness(0) invert(1)", opacity: 0.88 }} />
+                </div>
+              </div>
+
+              {/* OVERLAYS DE ENERGIA */}
+              {overlays.map((o, i) => (
+                <div key={i} style={{
+                  position: "absolute", top: o.top, bottom: o.bottom, left: o.left, right: o.right,
+                  transform: "translate(-50%, -50%)",
+                  background: "rgba(255,255,255,0.96)",
+                  borderLeft: `4px solid ${o.color}`,
+                  borderRadius: "12px",
+                  padding: "9px 16px",
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.18)",
+                  minWidth: "128px",
+                  backdropFilter: "blur(6px)",
+                }}>
+                  <div style={{ fontSize: "0.65rem", color: "#94A3B8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.09em" }}>
+                    {o.icon} {o.label}
+                  </div>
+                  <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "#0F172A", lineHeight: 1.2 }}>
+                    {fmt(o.value)} <span style={{ fontSize: "0.72rem", fontWeight: 500, color: "#64748B" }}>kW</span>
+                  </div>
+                </div>
               ))}
             </div>
+
+            {/* PAINEL LATERAL: FLYER + IMPACTO AMBIENTAL */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "14px", minHeight: 0, overflow: "hidden" }}>
+
+              {/* FLYER ROTATIVO */}
+              <div style={{ ...card({ background: "#f0f2f5", overflow: "hidden" }), flex: 2.5, position: "relative", minHeight: 0 }}>
+                <img
+                  key={flyer}
+                  src={flyers[flyer]}
+                  alt="Informação"
+                  className="fade-img"
+                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "contain", borderRadius: "16px" }}
+                />
+              </div>
+
+              {/* IMPACTO AMBIENTAL */}
+              <div style={{ ...card({ padding: "10px 14px" }), flex: 1.4, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px", flexShrink: 0 }}>
+                  <div style={{ width: "3px", height: "16px", background: `linear-gradient(180deg,${C.co2},${C.tree})`, borderRadius: "3px" }} />
+                  <span style={{ fontWeight: 700, fontSize: "0.85rem", color: "#1E293B" }}>Impacto Ambiental</span>
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px", flex: 1 }}>
+                  {envCards.map((item, i) => (
+                    <div key={i} style={{
+                      display: "flex", alignItems: "center", gap: "8px",
+                      padding: "6px 10px",
+                      background: item.color + "10",
+                      borderRadius: "10px",
+                      border: `1px solid ${item.color}25`,
+                      flex: 1,
+                    }}>
+                      <img src={item.icon} alt="" style={{ width: "24px", height: "24px", objectFit: "contain", flexShrink: 0 }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: "0.58rem", color: "#94A3B8", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.07em" }}>{item.label}</div>
+                        <div style={{ fontSize: "1rem", fontWeight: 800, color: "#0F172A", whiteSpace: "nowrap" }}>
+                          {item.value} <span style={{ fontSize: "0.65rem", color: "#64748B", fontWeight: 500 }}>{item.unit}</span>
+                        </div>
+                      </div>
+                      <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: item.color, flexShrink: 0 }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="kpi-grid">
-            <div className="kpi-card">
-              <img src="/carregador-de-smartphone.png" alt="Icon Bateria" className="kpi-image-icon" />
-              <div className="kpi-value-main">{kpis.kwh_producao}</div>
-              <div className="kpi-unit-kwh">kWh</div>
-            </div>
-            <div className="kpi-card">
-              <img src="/sol.png" alt="Icon Sol" className="kpi-image-icon" />
-              <div className="kpi-value-main">{kpis.kw_agora}</div>
-              <div className="kpi-unit">kW</div>
-            </div>
-            <div className="kpi-card">
-              <img src="/co2.png" alt="Icon CO2" className="kpi-image-icon" />
-              <div className="kpi-value-main">{kpis.toneladas_co2}</div>
-              <div className="kpi-unit">Ton CO₂</div>
-            </div>
-            <div className="kpi-card">
-              <img src="/tree.png" alt="Icon Árvore" className="kpi-image-icon" />
-              <div className="kpi-value-main">{kpis.arvores_plantadas}</div>
-              <div className="kpi-unit">Árvores</div>
-            </div>
-            <div className="kpi-card">
-              <img src="/euro.png" alt="Icon Euro" className="kpi-image-icon" />
-              <div className="kpi-value-main">{kpis.euros_poupados}</div>
-              <div className="kpi-unit">€</div>
-            </div>
-          </div>
-        </section>
+          {/* ── GRÁFICOS ── */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px" }}>
 
-        <section className="charts-section">
-          <div className="chart-container-line-full">
-            <h2>Produção & Consumo</h2>
-            <div className="chart-content">
-              <Line data={lineChartData} options={lineChartOptions} />
+            <div style={{ ...card({ padding: "16px 20px" }), display: "flex", flexDirection: "column" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+                <div style={{ width: "3px", height: "20px", background: `linear-gradient(180deg,${C.grid},${C.auto})`, borderRadius: "3px" }} />
+                <span style={{ fontWeight: 700, fontSize: "0.95rem", color: "#1E293B" }}>Consumo Diário</span>
+                <span style={{ marginLeft: "auto", fontSize: "0.7rem", color: "#94A3B8", background: "#F1F5F9", padding: "2px 10px", borderRadius: "20px", fontWeight: 600 }}>kWh</span>
+              </div>
+              <div style={{ flex: 1, position: "relative" }}>
+                <Bar data={consumoData} options={barOpts(consumoColors)} />
+              </div>
+            </div>
+
+            <div style={{ ...card({ padding: "16px 20px" }), display: "flex", flexDirection: "column" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
+                <div style={{ width: "3px", height: "20px", background: `linear-gradient(180deg,${C.pv},${C.inject})`, borderRadius: "3px" }} />
+                <span style={{ fontWeight: 700, fontSize: "0.95rem", color: "#1E293B" }}>Produção Diária</span>
+                <span style={{ marginLeft: "auto", fontSize: "0.7rem", color: "#94A3B8", background: "#F1F5F9", padding: "2px 10px", borderRadius: "20px", fontWeight: 600 }}>kWh</span>
+              </div>
+              <div style={{ flex: 1, position: "relative" }}>
+                <Bar data={producaoData} options={barOpts(producaoColors)} />
+              </div>
             </div>
           </div>
 
-          <div className="chart-container-right">
-            <h2>Composição de Consumo</h2>
-            <div className="chart-content">
-              <Bar data={barChartData} options={barChartOptions} />
+          {/* ── TICKER ── */}
+          <div style={{
+            background: "linear-gradient(135deg, #0F172A 0%, #1E3A5F 100%)",
+            borderRadius: "14px",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            boxShadow: "0 4px 16px rgba(15,23,42,0.3)",
+          }}>
+            <div style={{
+              background: "linear-gradient(135deg,#F59E0B 0%,#EF4444 100%)",
+              padding: "0 22px",
+              height: "100%",
+              display: "flex", alignItems: "center", gap: "8px",
+              flexShrink: 0,
+            }}>
+              <span style={{ fontSize: "1.1rem" }}>☀️</span>
+              <span style={{ color: "#fff", fontWeight: 800, fontSize: "0.8rem", textTransform: "uppercase", letterSpacing: "0.12em", whiteSpace: "nowrap" }}>Hoje</span>
+            </div>
+            <div style={{ overflow: "hidden", flex: 1 }}>
+              <div style={{
+                display: "inline-block",
+                whiteSpace: "nowrap",
+                animation: "marquee 40s linear infinite",
+                color: "#CBD5E1",
+                fontSize: "1rem",
+                fontWeight: 500,
+                paddingLeft: "40px",
+                letterSpacing: "0.01em",
+              }}>
+                {ticker}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{ticker}
+              </div>
             </div>
           </div>
-        </section>
 
-        <section className="ticker-section">
-          <div className="ticker">
-            <p>{messages[currentMessageIndex]}</p>
-          </div>
-        </section>
-      </main>
-    </div>
+          {/* ── FLYER A ECRÃ INTEIRO ── */}
+          {showSlide && (
+            <div style={{
+              position: "absolute", inset: 0,
+              zIndex: 50,
+              background: "#0F172A",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              animation: "fadeIn 0.6s ease",
+            }}>
+              <img
+                key={flyer}
+                src={flyers[flyer]}
+                alt="Flyer"
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              />
+            </div>
+          )}
+
+        </div>
+      </div>
+    </>
   );
 }
 
