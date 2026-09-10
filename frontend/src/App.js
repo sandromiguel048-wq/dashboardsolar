@@ -30,7 +30,7 @@ function App() {
   const [showSlide, setShowSlide] = useState(false);
   const clock = useClock();
 
-  const flyers = ["/flyer.png", "/ano-letivo-2026-2027.jpeg", "/flyer2.png.jpeg"];
+  const flyers = ["/flyer.png", "/ano-letivo-2026-2027.jpeg"];
 
   useEffect(() => {
     const handle = () => setScale(Math.min(window.innerWidth / 1920, window.innerHeight / 1080) * 0.98);
