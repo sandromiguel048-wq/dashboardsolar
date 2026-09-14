@@ -254,13 +254,17 @@ function App() {
                 <div style={{
                   position: "absolute", inset: 0,
                   zIndex: 20,
-                  background: "#0F172A",
+                  background: "#F1F5F9",
                   display: "flex", alignItems: "stretch", justifyContent: "center",
-                  gap: "12px", padding: "12px",
+                  gap: "14px", padding: "14px",
                   animation: "fadeIn 0.6s ease",
                 }}>
                   {flyers.map((src, i) => (
-                    <div key={i} style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div key={i} style={{
+                      ...card({ overflow: "hidden" }),
+                      flex: 1, minWidth: 0,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
                       <img src={src} alt="Flyer" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
                     </div>
                   ))}
