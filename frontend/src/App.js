@@ -361,7 +361,9 @@ function App() {
             <div style={{
               position: "absolute", inset: 0,
               zIndex: 50,
-              background: "#0F172A",
+              background: "rgba(15, 23, 42, 0.45)",
+              backdropFilter: "blur(24px)",
+              WebkitBackdropFilter: "blur(24px)",
               display: "flex", alignItems: "center", justifyContent: "center",
               animation: "fadeIn 0.6s ease",
             }}>
@@ -369,7 +371,7 @@ function App() {
                 key={flyer}
                 src={flyers[flyer]}
                 alt="Flyer"
-                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", borderRadius: "16px", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }}
               />
             </div>
           )}
