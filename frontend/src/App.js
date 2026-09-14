@@ -44,7 +44,7 @@ function App() {
     return () => clearInterval(t);
   }, [flyers.length]);
 
-  // Flyers lado a lado sobre a foto da escola: aparecem de 4 em 4 min, ficam 30s
+  // Flyer a ecrã inteiro: aparece de 4 em 4 min, fica 30s
   useEffect(() => {
     let hideTimer;
     const showEvery = setInterval(() => {
@@ -248,28 +248,6 @@ function App() {
                   </div>
                 </div>
               ))}
-
-              {/* FLYERS LADO A LADO — aparecem de 4 em 4 min sobre a foto da escola */}
-              {showSlide && (
-                <div style={{
-                  position: "absolute", inset: 0,
-                  zIndex: 20,
-                  background: "#F1F5F9",
-                  display: "flex", alignItems: "stretch", justifyContent: "center",
-                  gap: "14px", padding: "14px",
-                  animation: "fadeIn 0.6s ease",
-                }}>
-                  {flyers.map((src, i) => (
-                    <div key={i} style={{
-                      ...card({ overflow: "hidden" }),
-                      flex: 1, minWidth: 0,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                    }}>
-                      <img src={src} alt="Flyer" style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain" }} />
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
             {/* PAINEL LATERAL: FLYER + IMPACTO AMBIENTAL */}
@@ -377,6 +355,24 @@ function App() {
               </div>
             </div>
           </div>
+
+          {/* ── FLYER A ECRÃ INTEIRO ── */}
+          {showSlide && (
+            <div style={{
+              position: "absolute", inset: 0,
+              zIndex: 50,
+              background: "#0F172A",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              animation: "fadeIn 0.6s ease",
+            }}>
+              <img
+                key={flyer}
+                src={flyers[flyer]}
+                alt="Flyer"
+                style={{ width: "100%", height: "100%", objectFit: "contain" }}
+              />
+            </div>
+          )}
 
         </div>
       </div>
